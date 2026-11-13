@@ -1,0 +1,13 @@
+{
+  "name": "sam-auction",
+  "version": "0.1.0",
+  "private": true,
+  "description": "옥션&액션 — 월간 1:1 과외 경매 서비스",
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
