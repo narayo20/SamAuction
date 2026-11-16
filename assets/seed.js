@@ -20,7 +20,7 @@ function atKstHour(date, hour = 19) {
   return kstDate(p.year, p.month, p.day, hour, 0, 0, 0);
 }
 
-export const SEED_VERSION = 1;
+export const SEED_VERSION = 2;
 
 export function buildSeed(now = new Date()) {
   const c0 = cycleFor(now, 0);
@@ -331,6 +331,22 @@ export function buildSeed(now = new Date()) {
       status: 'ACTIVE',
     },
     {
+      id: 'ls_1007',
+      teacherId: 'u_t_lee',
+      title: '중등 국어 소그룹, 3인 그룹 화상 수업',
+      subject: '국어',
+      description: '같은 학년 3명이 함께 듣는 소그룹 화상 수업입니다. 지문을 함께 읽고 토론한 뒤, 매주 개별 첨삭 피드백을 드립니다.',
+      emoji: '👩‍🎨',
+      mode: 'GROUP',
+      groupSize: 3,
+      regions: [],
+      availability: availability([2, 4]),
+      premiumVideo: { title: '3인 소그룹 국어 수업, 이렇게 진행합니다', duration: 35, poster: '📖' },
+      createdAt: iso(livePriceStart),
+      bumpedAt: null,
+      status: 'ACTIVE',
+    },
+    {
       id: 'ls_0901',
       teacherId: 'u_t_kim',
       title: '중2 수학, 지난달 낙찰 수업',
@@ -541,6 +557,28 @@ export function buildSeed(now = new Date()) {
       endedAt: null,
     },
     {
+      id: 'a_1007',
+      listingId: 'ls_1007',
+      teacherId: 'u_t_lee',
+      cycleMonth: c0.auctionMonth,
+      classMonth: c0.classMonth,
+      method: BID_METHOD.SEALED_MAX,
+      state: AUCTION_STATE.LIVE,
+      startsAt: iso(c0.auctionStart),
+      endsAt: iso(c0.auctionEnd),
+      priceStartsAt: iso(livePriceStart),
+      startPrice: 22_000,
+      floorPrice: null,
+      decrementPerHour: 0,
+      minIncrement: 1_000,
+      sessions: 4,
+      createdAt: iso(livePriceStart),
+      bumpedAt: null,
+      awardedBidId: null,
+      finalPrice: null,
+      endedAt: null,
+    },
+    {
       id: 'a_0901',
       listingId: 'ls_0901',
       teacherId: 'u_t_kim',
@@ -665,6 +703,8 @@ export function buildSeed(now = new Date()) {
     { ...bidBase, id: 'b_1004_1', auctionId: 'a_1004', studentProfileId: 'sp_jiwoo', guardianId: 'u_g_park', bidderName: '서지우', guardianName: '박선영', region: '서울 송파구', amount: 36_000, contact: '010-4567-8901', paymentMethodId: 'pm_park1', state: BID_STATE.ACTIVE, placedAt: iso(hoursAgo(now, 9)), isRival: true },
     { ...bidBase, id: 'b_1004_2', auctionId: 'a_1004', studentProfileId: 'sp_minseo', guardianId: 'u_g_han', bidderName: '박민서', guardianName: '한미라', region: '서울 강동구', amount: 34_000, contact: '010-7890-1234', paymentMethodId: 'pm_han1', state: BID_STATE.ACTIVE, placedAt: iso(hoursAgo(now, 5)), isRival: true },
     { ...bidBase, id: 'b_1005_1', auctionId: 'a_1005', studentProfileId: 'sp_yuna', guardianId: 'u_g_jung', bidderName: '최유나', guardianName: '정수진', region: '서울 용산구', amount: 38_000, contact: '010-6789-0123', paymentMethodId: 'pm_jung1', state: BID_STATE.ACTIVE, placedAt: iso(hoursAgo(now, 4)), isRival: true },
+    { ...bidBase, id: 'b_1007_1', auctionId: 'a_1007', studentProfileId: 'sp_jiwoo', guardianId: 'u_g_park', bidderName: '서지우', guardianName: '박선영', region: '경기 성남시', amount: 26_000, contact: '010-4567-8901', paymentMethodId: 'pm_park1', state: BID_STATE.ACTIVE, placedAt: iso(hoursAgo(now, 8)), isRival: true },
+    { ...bidBase, id: 'b_1007_2', auctionId: 'a_1007', studentProfileId: 'sp_doyun', guardianId: 'u_g_choi', bidderName: '이도윤', guardianName: '최미경', region: '경기 용인시', amount: 24_000, contact: '010-5678-9012', paymentMethodId: 'pm_choi1', state: BID_STATE.ACTIVE, placedAt: iso(hoursAgo(now, 6)), isRival: true },
     { ...bidBase, id: 'b_0901_w', auctionId: 'a_0901', studentProfileId: 'sp_hajun', guardianId: 'u_g_kim', bidderName: '김하준', guardianName: '김민지', region: '서울 강남구', amount: 33_000, contact: '010-2456-7890', paymentMethodId: 'pm_kim1', state: BID_STATE.WON, placedAt: iso(new Date(new Date(cPrev.auctionEnd).getTime() - 2 * DAY)) },
     { ...bidBase, id: 'b_0901_l', auctionId: 'a_0901', studentProfileId: 'sp_jiwoo', guardianId: 'u_g_park', bidderName: '서지우', guardianName: '박선영', region: '서울 송파구', amount: 31_000, contact: '010-4567-8901', paymentMethodId: 'pm_park1', state: BID_STATE.LOST, placedAt: iso(new Date(new Date(cPrev.auctionEnd).getTime() - 3 * DAY)), isRival: true },
     { ...bidBase, id: 'b_0902_w', auctionId: 'a_0902', studentProfileId: 'sp_harin', guardianId: 'u_g_kim', bidderName: '김하린', guardianName: '김민지', region: '서울 서초구', amount: 35_000, contact: '010-2456-7890', paymentMethodId: 'pm_kim1', state: BID_STATE.WON, placedAt: iso(new Date(new Date(cPrev.auctionEnd).getTime() - 4 * DAY)) },

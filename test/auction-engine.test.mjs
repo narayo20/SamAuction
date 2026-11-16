@@ -11,6 +11,10 @@ import {
   computeDutchDecrement,
   evaluateSealedAuction,
   validateBid,
+  validateLessonMode,
+  LESSON_MODE,
+  GROUP_SIZE_MIN,
+  GROUP_SIZE_MAX,
   monthlyTotal,
   commissionFor,
   canTransition,
@@ -160,6 +164,34 @@ test('입찰 검증: 하락 가격은 서버 현재가와 일치해야 함', () 
   assert.throws(
     () => validateBid({ auction, bid: { amount: 29_000, regionCode: '서울' }, bidder, now: NOW }),
     (e) => e.code === 'PRICE_CHANGED' && e.details.expectedPrice === 28_000,
+  );
+});
+
+test('수업 방식: 방문은 지역 필수, 그룹은 정원 2~8명', () => {
+  assert.equal(validateLessonMode({ mode: LESSON_MODE.ONLINE }), true);
+  assert.equal(validateLessonMode({ mode: LESSON_MODE.BOTH, regions: ['서울 강남구'] }), true);
+  assert.equal(validateLessonMode({ mode: LESSON_MODE.GROUP, groupSize: GROUP_SIZE_MIN }), true);
+  assert.equal(validateLessonMode({ mode: LESSON_MODE.GROUP, groupSize: GROUP_SIZE_MAX }), true);
+
+  assert.throws(
+    () => validateLessonMode({ mode: LESSON_MODE.VISIT, regions: [] }),
+    (e) => e.code === 'INVALID_LESSON_MODE',
+  );
+  assert.throws(
+    () => validateLessonMode({ mode: LESSON_MODE.GROUP, groupSize: GROUP_SIZE_MIN - 1 }),
+    (e) => e.code === 'INVALID_GROUP_SIZE',
+  );
+  assert.throws(
+    () => validateLessonMode({ mode: LESSON_MODE.GROUP, groupSize: GROUP_SIZE_MAX + 1 }),
+    (e) => e.code === 'INVALID_GROUP_SIZE',
+  );
+  assert.throws(
+    () => validateLessonMode({ mode: LESSON_MODE.GROUP }),
+    (e) => e.code === 'INVALID_GROUP_SIZE',
+  );
+  assert.throws(
+    () => validateLessonMode({ mode: 'HYBRID' }),
+    (e) => e.code === 'INVALID_LESSON_MODE',
   );
 });
 

@@ -68,7 +68,7 @@ const server = http.createServer(async (req, res) => {
 
     const info = await stat(filePath).catch(() => null);
     if (!info || !info.isFile()) {
-      send(res, 404, '404 Not Found — 옥션&액션 프로토타입');
+      send(res, 404, '404 Not Found — 샘옥션클래스 프로토타입');
       return;
     }
 
@@ -106,7 +106,7 @@ server.on('error', (error) => {
 
 server.listen(PORT, HOST, () => {
   console.log('');
-  console.log('  옥션&액션 — SamAuction prototype');
+  console.log('  샘옥션클래스 — SamAuction prototype');
   console.log(`  http://${HOST}:${PORT}`);
   console.log('  모든 결제는 모의 결제이며 실제 금액이 청구되지 않습니다.');
   console.log('');

@@ -13,7 +13,9 @@ import {
   fmtShortDateTime,
   countdown,
   METHOD,
+  LESSON_MODE_INFO,
   modeLabel,
+  lessonRegionText,
   dayLabel,
   availabilityText,
   calendarStrip,
@@ -117,7 +119,7 @@ function teacherAuctionRow(a) {
     <div class="tar-main">
       <div class="tar-badges">${methodBadge(a.method)}${stateBadge(a.state)}</div>
       <a href="#/auction/${encodeURIComponent(a.id)}" class="tar-title">${esc(a.listing?.title || '')}</a>
-      <p class="small muted">${esc(a.cycleMonth)} 경매 · ${esc(a.classMonth)} 수업 · 입찰 ${a.bidCount}건</p>
+      <p class="small muted">${esc(a.cycleMonth)} 경매 · ${esc(a.classMonth)} 수업 · ${esc(modeLabel(a.listing?.mode, a.listing?.groupSize))} · 입찰 ${a.bidCount}건</p>
     </div>
     <div class="tar-price"><span>${a.state === AUCTION_STATE.AWARDED ? '낙찰가' : '현재/시작가'}</span><b>${price ? fmtWon(price) : '-'}</b><small>/시간</small></div>
     <div class="tar-actions">
@@ -157,12 +159,13 @@ export function renderNewListing() {
         <div class="form-section-head"><span class="form-num">01</span><div><h2>수업 기본 정보</h2><p>학부모님이 목록에서 가장 먼저 보는 정보입니다.</p></div></div>
         <div class="form-grid two">
           <label class="field"><span>과목</span><select name="subject" required><option>수학</option><option>영어</option><option>국어</option><option>과학</option><option>코딩</option><option>피아노</option><option>기타</option></select></label>
-          <label class="field"><span>수업 방식</span><select name="mode"><option value="VISIT">방문</option><option value="ONLINE">온라인</option><option value="BOTH">온라인·방문</option></select></label>
+          <label class="field"><span>수업 방식</span><select name="mode">${Object.entries(LESSON_MODE_INFO).map(([value, m], i) => `<option value="${value}" ${i === 0 ? 'selected' : ''}>${esc(m.icon)} ${esc(m.label)}</option>`).join('')}</select><p class="field-help">방문·화상·그룹 중 수업 방식을 선택합니다.</p></label>
+          <label class="field" data-mode-field="GROUP" hidden><span>그룹 정원</span><div class="input-won"><input type="number" name="groupSize" min="2" max="8" step="1" value="4"><span>명</span></div><p class="field-help">1:n 그룹 교육 정원은 2~8명입니다.</p></label>
         </div>
         <label class="field"><span>경매 제목</span><input name="title" maxlength="60" placeholder="예: 중2 수학, 한 달 동안 확실하게 잡기" required></label>
         <label class="field"><span>수업 소개</span><textarea name="description" rows="5" maxlength="600" placeholder="수업 방식, 숙제 관리, 학부모 피드백 등을 소개해 주세요." required></textarea></label>
         <div class="field"><span>프로필 이모지</span><div class="emoji-picker">${EMOJIS.map((e, i) => `<label class="emoji-option"><input type="radio" name="emoji" value="${e}" ${i === 0 ? 'checked' : ''}><span>${e}</span></label>`).join('')}</div></div>
-        <div class="field"><span>가능 지역 <small>(방문 수업 시 필수)</small></span><div class="chip-check-grid">${REGIONS.map((r) => `<label class="check-chip"><input type="checkbox" name="regions" value="${esc(r)}"><span>${esc(r)}</span></label>`).join('')}</div></div>
+        <div class="field"><span>가능 지역 <small>(1:1 방문교육 시 필수)</small></span><div class="chip-check-grid">${REGIONS.map((r) => `<label class="check-chip"><input type="checkbox" name="regions" value="${esc(r)}"><span>${esc(r)}</span></label>`).join('')}</div></div>
         <div class="field"><span>가능 시간</span><div class="availability-row"><div class="day-checks">${[1, 2, 3, 4, 5, 6, 0].map((d) => `<label class="check-chip small"><input type="checkbox" name="days" value="${d}" ${[1, 3, 5].includes(d) ? 'checked' : ''}><span>${dayLabel(d)}</span></label>`).join('')}</div><div class="time-range"><input type="time" name="availStart" value="18:00" aria-label="시작 시간"><span>~</span><input type="time" name="availEnd" value="21:00" aria-label="종료 시간"></div></div><p class="field-help">선택한 요일에 같은 시간대를 사용합니다. 프로토타입에서는 단일 시간대만 설정합니다.</p></div>
       </section>
 
@@ -398,7 +401,7 @@ export function renderOrder(id) {
           <div><dt>학생</dt><dd>${esc(student?.name || '-')} (${esc(student?.grade || '')})</dd></div>
           <div><dt>보호자</dt><dd>${esc(guardian?.name || '-')} · ${esc(guardian?.phone || '')}</dd></div>
           <div><dt>선생님</dt><dd>${esc(teacher?.name || '-')}</dd></div>
-          <div><dt>수업 방식</dt><dd>${esc(modeLabel(listing?.mode))} · ${esc((listing?.regions || []).join(', ') || '온라인')}</dd></div>
+          <div><dt>수업 방식</dt><dd>${esc(modeLabel(listing?.mode, listing?.groupSize))} · ${esc(lessonRegionText(listing || {}))}</dd></div>
         </dl>
         <div class="order-actions">
           ${user.role === 'GUARDIAN' && order.status === ORDER_STATE.PAID ? `<button class="btn btn-primary" type="button" data-action="open-schedule" data-id="${esc(order.id)}">수업 일정 확정</button>` : ''}

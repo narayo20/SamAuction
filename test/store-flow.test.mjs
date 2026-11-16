@@ -166,3 +166,38 @@ test('선생님 경매 등록: 월간 사이클과 마지막 날 종료', () => 
   assert.equal(created.endsAt, cycle.auctionEnd.toISOString());
   assert.equal(created.state, AUCTION_STATE.LIVE);
 });
+
+test('수업 방식: 그룹 등록은 정원을 저장하고 잘못된 정원·방문 지역은 거부한다', () => {
+  store.resetDemo();
+  store.setCurrentUser('u_t_kim');
+  const base = {
+    title: '테스트 수업 방식',
+    subject: '수학',
+    description: '테스트 설명',
+    emoji: '📐',
+    availability: [{ day: 1, start: '18:00', end: '21:00' }],
+    method: 'SEALED_MAX',
+    startPrice: 40_000,
+    minIncrement: 1_000,
+    cycleOffset: 0,
+  };
+
+  const group = store.createListing({ ...base, mode: 'GROUP', groupSize: 3, regions: [] });
+  const groupListing = store.listingById(group.listingId);
+  assert.equal(groupListing.mode, 'GROUP');
+  assert.equal(groupListing.groupSize, 3);
+
+  const online = store.createListing({ ...base, mode: 'ONLINE', regions: [] });
+  const onlineListing = store.listingById(online.listingId);
+  assert.equal(onlineListing.mode, 'ONLINE');
+  assert.equal(onlineListing.groupSize, null);
+
+  assert.throws(
+    () => store.createListing({ ...base, mode: 'GROUP', groupSize: 9, regions: [] }),
+    (e) => e.code === 'INVALID_GROUP_SIZE',
+  );
+  assert.throws(
+    () => store.createListing({ ...base, mode: 'VISIT', regions: [] }),
+    (e) => e.code === 'INVALID_LESSON_MODE',
+  );
+});

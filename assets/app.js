@@ -82,35 +82,35 @@ function notFound() {
 
 function viewFor(path) {
   if (path === '/' || path === '') {
-    return { title: '옥션&액션 — 월간 1:1 과외 경매', html: renderHome() };
+    return { title: '샘옥션클래스 — 월간 1:1 과외 경매', html: renderHome() };
   }
   if (path.startsWith('/auction/')) {
     const id = decodeId(path.slice('/auction/'.length));
     const auction = store.getAuction(id);
     return {
       title: auction?.listing?.title
-        ? `${auction.listing.title} · 옥션&액션`
-        : '경매 상세 · 옥션&액션',
+        ? `${auction.listing.title} · 샘옥션클래스`
+        : '경매 상세 · 샘옥션클래스',
       html: renderAuction(id),
     };
   }
   if (path === '/teacher') {
-    return { title: '선생님 스튜디오 · 옥션&액션', html: renderTeacher() };
+    return { title: '선생님 스튜디오 · 샘옥션클래스', html: renderTeacher() };
   }
   if (path === '/teacher/new') {
-    return { title: '새 수업 경매 등록 · 옥션&액션', html: renderNewListing() };
+    return { title: '새 수업 경매 등록 · 샘옥션클래스', html: renderNewListing() };
   }
   if (path === '/student') {
-    return { title: '내 수업 · 옥션&액션', html: renderStudent() };
+    return { title: '내 수업 · 샘옥션클래스', html: renderStudent() };
   }
   if (path === '/admin') {
-    return { title: '운영 콘솔 · 옥션&액션', html: renderAdmin() };
+    return { title: '운영 콘솔 · 샘옥션클래스', html: renderAdmin() };
   }
   if (path.startsWith('/order/')) {
     const id = decodeId(path.slice('/order/'.length));
-    return { title: '주문 상세 · 옥션&액션', html: renderOrder(id) };
+    return { title: '주문 상세 · 샘옥션클래스', html: renderOrder(id) };
   }
-  return { title: '페이지를 찾을 수 없어요 · 옥션&액션', html: notFound() };
+  return { title: '페이지를 찾을 수 없어요 · 샘옥션클래스', html: notFound() };
 }
 
 function renderView({ scroll = false, focusSearch = false } = {}) {
@@ -272,6 +272,10 @@ function syncListingForm() {
   const method = form.querySelector('input[name="method"]:checked')?.value || BID_METHOD.SEALED_MAX;
   form.querySelectorAll('[data-method-field]').forEach((field) => {
     field.hidden = field.dataset.methodField !== method;
+  });
+  const mode = form.querySelector('select[name="mode"]')?.value || 'ONLINE';
+  form.querySelectorAll('[data-mode-field]').forEach((field) => {
+    field.hidden = field.dataset.modeField !== mode;
   });
   const dutchPreview = form.querySelector('[data-dutch-preview]');
   if (dutchPreview) dutchPreview.hidden = method !== BID_METHOD.DUTCH;
@@ -464,6 +468,7 @@ function submitListing(form) {
     description: String(fd.get('description') || ''),
     emoji: String(fd.get('emoji') || '📚'),
     mode: String(fd.get('mode') || 'ONLINE'),
+    groupSize: Number(fd.get('groupSize') || 0) || null,
     regions: fd.getAll('regions').map(String),
     availability,
     method: String(fd.get('method') || BID_METHOD.SEALED_MAX),
@@ -722,7 +727,7 @@ document.addEventListener('change', (event) => {
 
   const listingForm = target.closest('[data-form="create-listing"]');
   if (listingForm) {
-    if (target.name === 'method') {
+    if (target.name === 'method' || target.name === 'mode') {
       syncListingForm();
     } else if (target.name === 'startPrice' || target.name === 'floorPrice') {
       updateListingPreview(listingForm);

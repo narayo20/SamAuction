@@ -2,7 +2,7 @@
   "name": "sam-auction",
   "version": "0.2.0",
   "private": true,
-  "description": "샘 옥션 — 옥션&액션 월간 1:1 과외 경매 서비스",
+  "description": "샘옥션클래스 — 1:1 방문·화상·1:n 그룹 과외 월간 경매 서비스",
   "type": "module",
   "scripts": {
     "start": "node server.mjs",

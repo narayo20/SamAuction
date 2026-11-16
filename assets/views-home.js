@@ -18,7 +18,9 @@ import {
   METHOD,
   AUCTION_STATE_INFO,
   ORDER_STATE_INFO,
+  LESSON_MODE_INFO,
   modeLabel,
+  lessonRegionText,
   availabilityText,
   calendarStrip,
   avatar,
@@ -52,9 +54,9 @@ export function renderHeader() {
   const premium = user.premium ? '<span class="premium-star" title="프리미엄">★</span>' : '';
   return `<header class="site-header">
     <div class="header-inner">
-      <a class="brand" href="#/" aria-label="옥션&액션 홈">
-        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
-        <span class="brand-text">옥션<span>&</span>액션</span>
+      <a class="brand" href="#/" aria-label="샘옥션클래스 홈">
+        <span class="brand-mark" aria-hidden="true">👩‍🏫</span>
+        <span class="brand-text">샘옥션<span>클래스</span><em class="brand-student" aria-hidden="true">🎓</em></span>
       </a>
       <span class="cycle-pill" title="이번 달 경매 사이클">
         <i class="live-dot"></i>
@@ -111,8 +113,8 @@ export function renderFooter() {
   return `<footer class="site-footer">
     <div class="footer-inner">
       <div>
-        <b>옥션&액션</b>
-        <p>월간 1:1 과외 경매 프로토타입. 모든 결제는 모의 결제이며 실제 금액이 청구되지 않습니다.</p>
+        <b>👩‍🏫 샘옥션클래스 🎓</b>
+        <p>1:1 방문·화상·1:n 그룹 과외를 월간 경매로 연결하는 프로토타입. 모든 결제는 모의 결제이며 실제 금액이 청구되지 않습니다.</p>
       </div>
       <div class="footer-meta">
         <span>경매 1일~말일</span><span>수업 주 1회 × 4회</span><span>에스크로 정산</span>
@@ -159,7 +161,7 @@ export function renderAuctionCard(auction, { compact = false } = {}) {
           <span class="review-count">후기 ${Number(teacher.reviewCount || 0)}</span>
         </div>
         <h3>${esc(listing.title || '수업 경매')}</h3>
-        <p class="card-meta">${esc(listing.subject || '')} · ${esc(modeLabel(listing.mode))} · ${esc((listing.regions || []).slice(0, 2).join(', ') || '온라인')}</p>
+        <p class="card-meta">${esc(listing.subject || '')} · ${esc(modeLabel(listing.mode, listing.groupSize))} · ${esc(lessonRegionText(listing))}</p>
       </div>
     </div>
     <div class="card-price-row">
@@ -185,6 +187,7 @@ function filterAuctions(auctions) {
   const f = ui.filters;
   let list = auctions.slice();
   if (f.subject !== '전체') list = list.filter((a) => a.listing?.subject === f.subject);
+  if (f.mode !== '전체') list = list.filter((a) => a.listing?.mode === f.mode);
   if (f.method !== '전체') list = list.filter((a) => a.method === f.method);
   if (f.region !== '전체') {
     list = list.filter((a) =>
@@ -251,9 +254,9 @@ export function renderHome() {
   return `<main>
     <section class="hero">
       <div class="hero-copy">
-        <p class="eyebrow"><span class="eyebrow-line"></span> 월간 1:1 과외 경매</p>
+        <p class="eyebrow"><span class="eyebrow-line"></span> 월간 1:1·그룹 과외 경매</p>
         <h1>가격은 <em>경매</em>로,<br>수업은 <em>확실</em>하게.</h1>
-        <p class="hero-sub">선생님은 한 달 수업을 열고, 학부모님은 아이에게 맞는 가격을 제안합니다.<br>말일 자동 낙찰부터 에스크로 결제·정산까지 한 번에.</p>
+        <p class="hero-sub">선생님은 방문·화상·그룹 수업을 열고, 학부모님은 아이에게 맞는 가격을 제안합니다.<br>말일 자동 낙찰부터 에스크로 결제·정산까지 한 번에.</p>
         <div class="hero-cta">
           <a class="btn btn-primary" href="#auctions">이번 달 경매 보기 <span aria-hidden="true">→</span></a>
           <a class="btn btn-ghost" href="#/teacher/new">선생님으로 등록</a>
@@ -281,6 +284,10 @@ export function renderHome() {
           ${subjects.map((s) => `<button type="button" class="chip ${ui.filters.subject === s ? 'is-active' : ''}" data-filter="subject" data-value="${esc(s)}">${esc(s)}</button>`).join('')}
         </div>
         <div class="filter-selects">
+          <label><span class="sr-only">수업 방식</span><select data-filter="mode">
+            <option value="전체" ${ui.filters.mode === '전체' ? 'selected' : ''}>수업 방식 전체</option>
+            ${Object.entries(LESSON_MODE_INFO).map(([value, m]) => `<option value="${value}" ${ui.filters.mode === value ? 'selected' : ''}>${esc(m.label)}</option>`).join('')}
+          </select></label>
           <label><span class="sr-only">입찰 방식</span><select data-filter="method">
             <option value="전체" ${ui.filters.method === '전체' ? 'selected' : ''}>입찰 방식 전체</option>
             ${Object.values(METHOD).map((m) => `<option value="${m.label === '비공개 최대가' ? 'SEALED_MAX' : m.label === '선착순' ? 'FIRST_COME' : 'DUTCH'}" ${ui.filters.method === (m.label === '비공개 최대가' ? 'SEALED_MAX' : m.label === '선착순' ? 'FIRST_COME' : 'DUTCH') ? 'selected' : ''}>${esc(m.label)}</option>`).join('')}
@@ -309,7 +316,7 @@ export function renderHome() {
     <section class="how-section">
       <div class="section-head"><div><p class="eyebrow">HOW IT WORKS</p><h2>경매부터 정산까지, 한 달에 한 번</h2></div></div>
       <div class="how-grid">
-        <div class="how-card"><span class="how-num">01</span><span class="how-icon">📝</span><h3>선생님 수업 등록</h3><p>사진·이모지, 가능 시간, 시간당 가격, 입찰 방식을 설정합니다. 프리미엄은 숏폼 영상과 월 1회 끌올을 사용할 수 있어요.</p></div>
+        <div class="how-card"><span class="how-num">01</span><span class="how-icon">📝</span><h3>선생님 수업 등록</h3><p>1:1 방문·화상·1:n 그룹 수업 중 방식을 고르고, 가능 시간·시간당 가격·입찰 방식을 설정합니다. 프리미엄은 숏폼 영상과 월 1회 끌올을 사용할 수 있어요.</p></div>
         <div class="how-card"><span class="how-num">02</span><span class="how-icon">🔒</span><h3>학부모 입찰</h3><p>아이 이름·지역·결제수단을 등록하고 입찰합니다. 비공개 최대가는 서로의 금액을 볼 수 없습니다.</p></div>
         <div class="how-card"><span class="how-num">03</span><span class="how-icon">⚖️</span><h3>말일 자동 낙찰</h3><p>경매 종료 시 서버가 최고가를 평가합니다. 낙찰자의 카드로 자동 결제하고, 실패하면 차순위로 넘어갑니다.</p></div>
         <div class="how-card"><span class="how-num">04</span><span class="how-icon">💳</span><h3>수업·정산</h3><p>결제금은 에스크로에 보관됩니다. 수업 완료 후 플랫폼 수수료 10%를 제외하고 선생님께 정산됩니다.</p></div>
@@ -339,7 +346,7 @@ function teacherCard(auction) {
         <div class="teacher-name-row"><h2>${esc(t.displayName || '선생님')}</h2>${auction.teacherPremium ? '<span class="badge badge-premium">★ 프리미엄</span>' : ''}</div>
         <div class="teacher-stats"><span class="rating">★ ${Number(t.rating || 0).toFixed(1)}</span><span>후기 ${Number(t.reviewCount || 0)}</span><span>완료 ${Number(t.completedCount || 0)}회</span></div>
         <p class="teacher-bio">${esc(t.bio || '')}</p>
-        <div class="teacher-tags">${(t.subjects || []).map((s) => `<span class="tag">${esc(s)}</span>`).join('')}<span class="tag">${esc(modeLabel(auction.listing?.mode))}</span>${(t.regions || []).map((r) => `<span class="tag tag-soft">${esc(r)}</span>`).join('')}</div>
+        <div class="teacher-tags">${(t.subjects || []).map((s) => `<span class="tag">${esc(s)}</span>`).join('')}<span class="tag">${esc(modeLabel(auction.listing?.mode, auction.listing?.groupSize))}</span>${(t.regions || []).map((r) => `<span class="tag tag-soft">${esc(r)}</span>`).join('')}</div>
       </div>
     </div>
   </section>`;
@@ -396,17 +403,20 @@ function bidFeed(auction) {
 function planPanel(auction) {
   const cycle = cycleFor(new Date(auction.startsAt), 0);
   const price = priceOf(auction);
+  const listing = auction.listing || {};
   return `<section class="panel plan-panel">
     <div class="panel-head"><div><p class="eyebrow">MONTHLY PLAN</p><h2>${esc(cycle.classLabel)}</h2></div><span class="plan-badge">4회</span></div>
     ${calendarStrip(cycle)}
     <div class="plan-grid">
       <div><span>수업 구성</span><b>주 1회 60분 · 총 4회</b></div>
-      <div><span>가능 시간</span><b>${esc(availabilityText(auction.listing?.availability))}</b></div>
-      <div><span>수업 방식</span><b>${esc(modeLabel(auction.listing?.mode))}</b></div>
-      <div><span>가능 지역</span><b>${esc((auction.listing?.regions || []).join(', ') || '온라인')}</b></div>
+      <div><span>가능 시간</span><b>${esc(availabilityText(listing.availability))}</b></div>
+      <div><span>수업 방식</span><b>${esc(modeLabel(listing.mode, listing.groupSize))}</b></div>
+      ${listing.mode === 'GROUP' ? `<div><span>그룹 정원</span><b>${Number(listing.groupSize) || '-'}명</b></div>` : ''}
+      <div><span>${listing.mode === 'ONLINE' ? '수업 지역' : '가능 지역'}</span><b>${esc(lessonRegionText(listing))}</b></div>
       <div><span>시간당 ${auction.state === AUCTION_STATE.AWARDED ? '낙찰가' : '시작가'}</span><b>${price.value ? fmtWon(price.value) : '-'}</b></div>
       <div><span>월 예상 결제</span><b>${price.monthly ? fmtWon(price.monthly) : '-'}</b></div>
     </div>
+    ${listing.mode === 'GROUP' ? `<p class="plan-note">그룹 수업은 정원 ${Number(listing.groupSize) || '-'}명이 함께 듣는 수업으로, 이 경매에서는 그중 1자리를 낙찰받습니다.</p>` : ''}
     <p class="plan-note">결제금은 수업 완료 전까지 에스크로에 보관됩니다. 수업 완료 후 플랫폼 수수료 10%를 제외하고 선생님께 정산됩니다.</p>
   </section>`;
 }
@@ -508,7 +518,7 @@ export function renderAuction(id) {
         <div class="auction-title-block">
           <div class="title-badges">${methodBadge(auction.method)}${auction.teacherPremium ? '<span class="badge badge-premium">★ 프리미엄</span>' : ''}${auction.bumpedAt ? '<span class="badge badge-bump">끌올</span>' : ''}</div>
           <h1>${esc(listing.title || '')}</h1>
-          <p class="auction-sub">${esc(listing.subject || '')} · ${esc(modeLabel(listing.mode))} · ${esc((listing.regions || []).join(', ') || '온라인')} · ${esc(cycle.classLabel)}</p>
+          <p class="auction-sub">${esc(listing.subject || '')} · ${esc(modeLabel(listing.mode, listing.groupSize))} · ${esc(lessonRegionText(listing))} · ${esc(cycle.classLabel)}</p>
         </div>
         ${teacherCard(auction)}
         ${videoCard(listing.premiumVideo)}

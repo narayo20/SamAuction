@@ -11,6 +11,8 @@ import {
   evaluateSealedAuction,
   validateBid,
   validateAuctionTerms,
+  validateLessonMode,
+  LESSON_MODE,
   monthlyTotal,
   commissionFor,
   kstDate,
@@ -848,9 +850,10 @@ export const store = {
     });
     if (!String(input.title || '').trim()) throw new DomainError('INVALID_LISTING', '경매 제목을 입력해 주세요.');
     if (!String(input.description || '').trim()) throw new DomainError('INVALID_LISTING', '수업 소개를 입력해 주세요.');
-    if (input.mode === 'VISIT' && (!input.regions || input.regions.length === 0)) {
-      throw new DomainError('INVALID_LISTING', '방문 수업은 가능 지역을 1개 이상 선택해 주세요.');
-    }
+    const mode = String(input.mode || LESSON_MODE.ONLINE);
+    const regions = Array.isArray(input.regions) ? input.regions : [];
+    const groupSize = mode === LESSON_MODE.GROUP ? Number(input.groupSize) : null;
+    validateLessonMode({ mode, regions, groupSize });
     if (input.premiumVideo && !user.premium) {
       throw new DomainError('PREMIUM_REQUIRED', '숏폼 영상은 프리미엄 선생님만 등록할 수 있습니다.');
     }
@@ -863,8 +866,9 @@ export const store = {
       subject: String(input.subject || '기타'),
       description: String(input.description).trim(),
       emoji: String(input.emoji || '📚'),
-      mode: input.mode || 'ONLINE',
-      regions: Array.isArray(input.regions) ? input.regions : [],
+      mode,
+      groupSize,
+      regions,
       availability: Array.isArray(input.availability) ? input.availability : [],
       premiumVideo: input.premiumVideo || null,
       createdAt: iso(now()),

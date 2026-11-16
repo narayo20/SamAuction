@@ -7,7 +7,7 @@ import {
 } from '../src/domain/auction-engine.mjs';
 
 export const ui = {
-  filters: { subject: '전체', method: '전체', region: '전체', sort: 'ending', q: '' },
+  filters: { subject: '전체', mode: '전체', method: '전체', region: '전체', sort: 'ending', q: '' },
   demoOpen: false,
   refresh: () => {},
   navigate: (path) => {
@@ -156,8 +156,26 @@ export const ORDER_STATE_INFO = {
   REFUNDED: { label: '환불 완료', tone: 'muted' },
 };
 
-export function modeLabel(mode) {
-  return { ONLINE: '온라인', VISIT: '방문', BOTH: '온라인·방문' }[mode] || mode;
+export const LESSON_MODE_INFO = {
+  VISIT: { label: '1:1 방문교육', short: '방문', icon: '🏠' },
+  ONLINE: { label: '1:1 화상교육', short: '화상', icon: '💻' },
+  BOTH: { label: '1:1 방문·화상', short: '방문·화상', icon: '🏠💻' },
+  GROUP: { label: '1:n 그룹 교육', short: '그룹', icon: '👥' },
+};
+
+export function modeLabel(mode, groupSize) {
+  if (mode === 'GROUP') {
+    return groupSize ? `1:n 그룹 교육 (정원 ${groupSize}명)` : '1:n 그룹 교육';
+  }
+  return LESSON_MODE_INFO[mode]?.label || mode;
+}
+
+export function lessonRegionText(listing = {}) {
+  const regions = listing.regions || [];
+  if (regions.length) return regions.join(', ');
+  if (listing.mode === 'ONLINE') return '화상 · 지역 무관';
+  if (listing.mode === 'GROUP') return '그룹 · 지역 협의';
+  return '지역 협의';
 }
 
 export function dayLabel(day) {

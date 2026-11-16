@@ -1,11 +1,12 @@
 /**
- * 옥션&액션 — 경매 도메인 엔진 (프레임워크/의존성 없음)
+ * 샘옥션클래스 — 경매 도메인 엔진 (프레임워크/의존성 없음)
  *
  * 핵심 규칙
  *  - 경매 사이클: 매월 1일 00:00:00 ~ 말일 23:59:59.999 (KST)
  *  - 수업 사이클: 낙찰 다음 달, 주 1회 60분 × 4회
  *  - 입찰 단위: 시간당 수업료(원). 결제 총액 = 낙찰 시간당 가격 × 4회
  *  - 방식: 비공개 최대가(2가격), 선착순, 하락(1시간 틱)
+ *  - 수업 방식: 1:1 방문교육, 1:1 화상교육, 1:1 방문·화상, 1:n 그룹 교육
  */
 
 export const HOUR_MS = 3_600_000;
@@ -19,6 +20,43 @@ export const BID_METHOD = Object.freeze({
   FIRST_COME: 'FIRST_COME',
   DUTCH: 'DUTCH',
 });
+
+/**
+ * 수업 방식.
+ * - VISIT: 1:1 방문교육 (가능 지역 1개 이상 필수)
+ * - ONLINE: 1:1 화상교육
+ * - BOTH: 1:1 방문·화상 (방문과 화상 모두 가능)
+ * - GROUP: 1:n 그룹 교육 (정원 2~8명)
+ */
+export const LESSON_MODE = Object.freeze({
+  VISIT: 'VISIT',
+  ONLINE: 'ONLINE',
+  BOTH: 'BOTH',
+  GROUP: 'GROUP',
+});
+
+export const GROUP_SIZE_MIN = 2;
+export const GROUP_SIZE_MAX = 8;
+
+export function validateLessonMode({ mode, regions = [], groupSize } = {}) {
+  if (!Object.values(LESSON_MODE).includes(mode)) {
+    throw new DomainError('INVALID_LESSON_MODE', '지원하지 않는 수업 방식입니다.', { mode });
+  }
+  if (mode === LESSON_MODE.VISIT && (!Array.isArray(regions) || regions.length === 0)) {
+    throw new DomainError('INVALID_LESSON_MODE', '1:1 방문교육은 가능 지역을 1개 이상 선택해 주세요.');
+  }
+  if (mode === LESSON_MODE.GROUP) {
+    const size = Number(groupSize);
+    if (!Number.isInteger(size) || size < GROUP_SIZE_MIN || size > GROUP_SIZE_MAX) {
+      throw new DomainError(
+        'INVALID_GROUP_SIZE',
+        `그룹 교육 정원은 ${GROUP_SIZE_MIN}~${GROUP_SIZE_MAX}명 사이여야 합니다.`,
+        { groupSize },
+      );
+    }
+  }
+  return true;
+}
 
 export const AUCTION_STATE = Object.freeze({
   DRAFT: 'DRAFT',

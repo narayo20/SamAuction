@@ -61,7 +61,7 @@ export function openBidModal(auctionId) {
   openModal(`${modalHeader(isSealed ? '비공개 최대가 입찰' : isDutch ? '현재가로 낙찰받기' : '선착순 낙찰', `${m.label} · ${auction.listing?.title || ''}`, 'modal-wide')}
     <div class="bid-modal-body">
       <div class="bid-modal-summary">
-        <div class="modal-teacher"><span class="modal-teacher-emoji" aria-hidden="true">${esc(auction.teacher?.emoji || '📚')}</span><div><b>${esc(auction.teacher?.displayName || '선생님')}</b><small>${esc(modeLabel(listing.mode))} · ${esc((listing.regions || []).join(', ') || '온라인')}</small></div></div>
+        <div class="modal-teacher"><span class="modal-teacher-emoji" aria-hidden="true">${esc(auction.teacher?.emoji || '📚')}</span><div><b>${esc(auction.teacher?.displayName || '선생님')}</b><small>${esc(modeLabel(listing.mode, listing.groupSize))} · ${esc((listing.regions || []).join(', ') || (listing.mode === 'GROUP' ? '그룹 · 지역 협의' : listing.mode === 'ONLINE' ? '화상 · 지역 무관' : '지역 협의'))}</small></div></div>
         <div class="modal-price"><span>${isSealed ? '시작가' : isDutch ? '현재가' : '낙찰가'}</span><b>${fmtWon(isSealed ? auction.startPrice : auction.currentPrice)}</b><small>/시간 · 월 ${fmtWon((isSealed ? auction.startPrice : auction.currentPrice) * 4)}</small></div>
       </div>
       <div class="modal-note">${esc(m.hint)}</div>
