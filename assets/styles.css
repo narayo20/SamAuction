@@ -2563,6 +2563,11 @@ main {
   border-color: transparent;
 }
 
+.cycle-mini .cal-days {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+
 .cycle-mini .cal-day {
   background: rgba(255, 253, 248, 0.7);
   font-size: 9px;

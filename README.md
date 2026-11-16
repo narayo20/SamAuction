@@ -50,6 +50,40 @@
 - **데모 도구**: 시간 이동(+1시간/+1일/월말 10초 전), 가상 경쟁 입찰, 데모 초기화
 - **반응형 UI**: 모바일 1열 레이아웃, 하단 시트형 모달
 
+## 서비스 로직 플로우
+
+선생님·학생·학부모·운영자 관점의 서비스 흐름을 Mermaid 다이어그램 12개로 정리했습니다.
+
+- **[docs/service-flow.md](docs/service-flow.md)** — 액터별 플로우, 입찰 방식별 상세 흐름, 경매·주문·입찰 상태 다이어그램, 권한 매트릭스, 예외 처리 규칙, 코드 매핑
+
+## 데모 화면
+
+실제 앱을 실행해 촬영한 화면입니다. 각 이미지는 [docs/demo/](docs/demo/)에 원본으로 있습니다.
+
+### 학생·학부모 기준
+
+| # | 화면 | 설명 |
+| --- | --- | --- |
+| 1 | <img src="docs/demo/student/01-student-home.png" width="360" alt="학생 홈" /> | 홈 진입 — 이번 달 경매 히어로와 월간 사이클 안내 |
+| 2 | <img src="docs/demo/student/02-student-auctions.png" width="360" alt="경매 목록" /> | 경매 목록 — 과목·입찰 방식·지역 필터와 월간 캘린더 |
+| 3 | <img src="docs/demo/student/03-student-auction.png" width="360" alt="경매 상세" /> | 경매 상세 — 선생님 프로필, 프리미엄 영상, 비공개 최대가 입찰 패널 |
+| 4 | <img src="docs/demo/student/04-student-bid-modal.png" width="360" alt="입찰 모달" /> | 비공개 최대가 입찰 — 자녀 선택과 보호자 동의 |
+| 5 | <img src="docs/demo/student/05-student-payment.png" width="360" alt="모의 결제 영수증" /> | 모의 결제 — 승인 후 영수증과 결제 내역 |
+| 6 | <img src="docs/demo/student/06-student-dashboard.png" width="360" alt="학생 대시보드" /> | 학생·학부모 데스크 — 자녀 2명, 내 입찰, 수업·결제 현황 |
+| 7 | <img src="docs/demo/student/07-student-order.png" width="360" alt="주문 상세" /> | 주문 상세 — 결제 정보, 에스크로 보관 상태, 타임라인 |
+| 8 | <img src="docs/demo/student/08-student-schedule.png" width="360" alt="일정 확정" /> | 수업 일정 확정 — 4회기 일정 입력 |
+| 9 | <img src="docs/demo/student/09-student-completed.png" width="360" alt="수업 완료" /> | 수업 완료 처리 후 주문 상태 |
+
+### 선생님 기준
+
+| # | 화면 | 설명 |
+| --- | --- | --- |
+| 1 | <img src="docs/demo/teacher/01-teacher-dashboard.png" width="360" alt="선생님 대시보드" /> | 선생님 스튜디오 — 경매별 입찰·낙찰 현황, 정산 예정, 미니 캘린더 |
+| 2 | <img src="docs/demo/teacher/02-teacher-listing-basic.png" width="360" alt="경매 등록 1단계" /> | 새 경매 등록 ① — 제목·소개·과목·지역 설정 |
+| 3 | <img src="docs/demo/teacher/03-teacher-listing-method.png" width="360" alt="경매 등록 2단계" /> | 새 경매 등록 ② — 입찰 방식·가격·월간 사이클·프리미엄 영상 |
+| 4 | <img src="docs/demo/teacher/04-teacher-auction.png" width="360" alt="내 경매 상세" /> | 내가 등록한 경매(소유자 뷰) — 실시간 입찰 현황과 프리미엄 끌올 |
+| 5 | <img src="docs/demo/teacher/05-teacher-settlement.png" width="360" alt="정산" /> | 정산 — 에스크로 지급 완료(RELEASED), 수수료 10%와 실지급액 |
+
 ## 체험 계정
 
 앱 우측 상단의 **체험 계정 전환**에서 역할을 바꿀 수 있습니다.
@@ -128,6 +162,11 @@ SamAuction/
 ├─ test/
 │  ├─ auction-engine.test.mjs
 │  └─ store-flow.test.mjs
+├─ docs/
+│  ├─ service-flow.md           # 액터별 서비스 로직 다이어그램
+│  └─ demo/
+│     ├─ student/               # 학생·학부모 기준 데모 화면 9장
+│     └─ teacher/               # 선생님 기준 데모 화면 5장
 ├─ sam_logic.md.txt            # 최초 요구사항 원문
 └─ README.md
 ```
