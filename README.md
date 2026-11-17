@@ -181,8 +181,8 @@ SamAuction/
 ├─ docs/
 │  ├─ service-flow.md           # 액터별 서비스 로직 다이어그램
 │  └─ demo/
-│     ├─ student/               # 학생·학부모 기준 데모 화면 9장
-│     └─ teacher/               # 선생님 기준 데모 화면 5장
+│     ├─ student/               # 학생·학부모 기준 데모 화면 10장
+│     └─ teacher/               # 선생님 기준 데모 화면 6장
 ├─ sam_logic.md.txt            # 최초 요구사항 원문
 └─ README.md
 ```
